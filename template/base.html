@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Кофейня{% endblock %}</title>
+
+    <style>
+        :root {
+            --dark: #1e1e1e;
+            --light: #f1f1f1;
+            --accent: #d32f2f;
+            --gray: #555;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .block {
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        .bg-dark { background: var(--dark); color: var(--light); }
+        .bg-light { background: white; }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+        }
+        .btn-light { background: var(--light); color: var(--dark); }
+        .btn-dark  { background: var(--dark); color: white; }
+        .btn-accent { background: var(--accent); color: white; }
+        .input, .selector {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .selector {
+            appearance: none;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='gray' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat right 16px center;
+            background-size: 12px;
+        }
+        .block-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        .form-field {
+            flex: 1;
+            min-width: 220px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

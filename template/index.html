@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Кофе — главная{% endblock %}
+
+{% block extra_css %}
+<style>
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+    }
+    .product-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+    .product-image {
+        width: 100%;
+        height: 240px;
+        object-fit: contain;
+        background: #f8f9fa;
+        padding: 16px;
+        box-sizing: border-box;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .product-name {
+        font-size: 1.28rem;
+        font-weight: 600;
+        margin: 0 0 10px;
+        line-height: 1.3;
+    }
+    .product-meta {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+    }
+    .price {
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 12px 0 16px;
+    }
+    .btn-cart {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.05rem;
+    }
+    .admin-actions {
+        margin-top: 12px;
+        font-size: 0.92rem;
+    }
+    .admin-actions a {
+        color: #1976d2;
+        text-decoration: none;
+    }
+    .admin-actions a:hover {
+        text-decoration: underline;
+    }
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px 20px;
+        color: #777;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if user_role == 'admin' %}
+<div class="block bg-dark">
+    <select class="selector" onchange="if(this.value) location.href = this.value">
+        <option value="" disabled selected>Добавить новый...</option>
+        <option value="{% url 'main:create_brand' %}">Бренд</option>
+        <option value="{% url 'main:create_category' %}">Категорию</option>
+        <option value="{% url 'main:create_format' %}">Форму выпуска</option>
+        <option value="{% url 'main:create_product' %}">Продукт</option>
+    </select>
+</div>
+{% endif %}
+
+{% if user_role != 'guest' %}
+<div class="block bg-dark">
+    <form method="get" class="block-row">
+        <div class="form-field" style="flex-grow: 2;">
+            <input type="text" name="search" value="{{ search_value|default:'' }}" placeholder="Поиск по названию, бренду, категории..." class="input">
+        </div>
+        <div class="form-field">
+            <select name="sort" class="selector">
+                <option value="name-asc"  {% if sort == 'name-asc' %}selected{% endif %}>Название А → Я</option>
+                <option value="name-desc" {% if sort == 'name-desc' %}selected{% endif %}>Название Я → А</option>
+                <option value="price-asc" {% if sort == 'price-asc' %}selected{% endif %}>Цена по возрастанию</option>
+                <option value="price-desc"{% if sort == 'price-desc' %}selected{% endif %}>Цена по убыванию</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-light">Применить</button>
+            <a href="{% url 'main:products' %}" class="btn btn-light">Сбросить</a>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<div class="products-grid block bg-light">
+    {% for product in page_obj %}
+    <div class="product-card">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+        {% else %}
+            <div class="product-image" style="display:flex; align-items:center; justify-content:center; color:#aaa; font-size:1.1rem;">
+                Фото отсутствует
+            </div>
+        {% endif %}
+
+        <div class="card-body">
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-meta"><strong>Бренд:</strong> {{ product.brand }}</div>
+            <div class="product-meta"><strong>Категория:</strong> {{ product.category }}</div>
+            {% if product.weight %}
+            <div class="product-meta"><strong>Вес/объём:</strong> {{ product.weight }}</div>
+            {% endif %}
+            {% if product.servings %}
+            <div class="product-meta"><strong>Порций:</strong> {{ product.servings }}</div>
+            {% endif %}
+
+            <div class="price">{{ product.price }} ₽</div>
+
+            <button class="btn btn-accent btn-cart">В корзину</button>
+
+            {% if user_role == 'admin' %}
+            <div class="admin-actions">
+                <a href="{% url 'main:update_product' product.pk %}">✏️ Редактировать</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        {% if search_value %}
+            По вашему запросу ничего не найдено...
+        {% else %}
+            Товары пока отсутствуют
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="block" style="text-align: center; margin-top: 32px;">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if search_value %}&search={{ search_value }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="btn btn-light" style="margin-right: 16px;">← Назад</a>
+    {% endif %}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search_value %}&search={{ search_value }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="btn btn-light">Вперёд →</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 640px;
+        margin: 0 auto;
+    }
+    .form-title {
+        text-align: center;
+        margin-bottom: 32px;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+    .form-group {
+        margin-bottom: 24px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    .form-group .help-text {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 4px;
+    }
+    .form-errors {
+        color: #c62828;
+        font-size: 0.95rem;
+        margin-top: 4px;
+    }
+    .submit-btn {
+        padding: 14px 32px;
+        font-size: 1.1rem;
+        width: 100%;
+        max-width: 300px;
+        margin: 32px auto 0;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="block bg-light form-container">
+    <h1 class="form-title">{{ title }}</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+            {{ field }}
+
+            {% if field.errors %}
+                <div class="form-errors">{{ field.errors|join:"<br>" }}</div>
+            {% endif %}
+
+            {% if field.help_text %}
+                <div class="help-text">{{ field.help_text|safe }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-accent submit-btn">Сохранить</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px;">
+        <a href="{% url 'main:products' %}" class="btn btn-light">Вернуться к списку</a>
+    </div>
+</div>
+
+{% endblock %}
